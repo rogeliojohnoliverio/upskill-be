@@ -34,12 +34,13 @@ class User extends Authenticatable
         return $this->morphOne(Image::class, 'attachable')->oldestOfMany();
     }
 
-    public function uploadAvatar(UploadedFile $avatar): string
+    public function uploadAvatar(UploadedFile $avatar): array
     {
         $filename = Str::random(40) . '.' . $avatar->getClientOriginalExtension();
-        if (env('FILESYSTEM_DISK') === 'local') {
-            Storage::disk('local')->put('public/' . $filename, file_get_contents($avatar));
-        }
-        return $filename;
+        Storage::put('public/' . $filename, file_get_contents($avatar));
+        return [
+            "filename" => $filename,
+            "url" => Storage::url('public/' . $filename)
+        ];
     }
 }

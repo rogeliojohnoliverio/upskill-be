@@ -18,11 +18,11 @@ class Attachment extends Model
         return $this->morphTo();
     }
 
-    public static function transformAvatarFileRequest(UploadedFile $file, string $filename): array
+    public static function transformAvatarFileRequest(UploadedFile $file, array $fileContent): array
     {
         return [
-            'url' => '/storage/' . $filename,
-            'file_name' => $filename,
+            'url' => env('FILESYSTEM_DISK') === 'local' ? env('APP_URL') . $fileContent['url'] : $fileContent['url'],
+            'file_name' => $fileContent['filename'],
             'extension' => $file->getClientOriginalExtension(),
             'type' => 'avatar'
         ];

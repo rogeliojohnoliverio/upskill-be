@@ -18,8 +18,8 @@ class UserController extends Controller
     public function store(UserStoreRequest $request)
     {
         $user = User::create(Arr::except($request->validated(), ['profile_picture']));
-        $filename = $user->uploadAvatar($request->validated()['profile_picture']);
-        $user->attachments()->create(Attachment::transformAvatarFileRequest($request->validated()['profile_picture'], $filename));
+        $file = $user->uploadAvatar($request->validated()['profile_picture']);
+        $user->attachments()->create(Attachment::transformAvatarFileRequest($request->validated()['profile_picture'], $file));
         return new UserResource($user);
     }
 }
