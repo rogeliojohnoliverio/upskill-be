@@ -27,4 +27,13 @@ class Attachment extends Model
             'type' => 'avatar'
         ];
     }
+    public static function transformQRCodeFileRequest(array $fileContent): array
+    {
+        return [
+            'url' => env('FILESYSTEM_DISK') === 'local' ? env('APP_URL') . $fileContent['url'] : $fileContent['url'],
+            'file_name' => $fileContent['filename'],
+            'extension' => 'image/svg',
+            'type' => 'qrCode'
+        ];
+    }
 }

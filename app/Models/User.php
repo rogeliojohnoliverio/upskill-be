@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\HtmlString;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
 
@@ -38,6 +39,16 @@ class User extends Authenticatable
     {
         $filename = Str::random(40) . '.' . $avatar->getClientOriginalExtension();
         Storage::put('public/' . $filename, file_get_contents($avatar));
+        return [
+            "filename" => $filename,
+            "url" => Storage::url('public/' . $filename)
+        ];
+    }
+
+    public function uploadQRCode(string $qrCode): array
+    {
+        $filename = Str::random(40) . '.svg';
+        Storage::put('public/' . $filename, file_get_contents('data:image/svg+xml;base64,' . base64_encode($qrCode)));
         return [
             "filename" => $filename,
             "url" => Storage::url('public/' . $filename)

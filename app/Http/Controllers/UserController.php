@@ -21,44 +21,10 @@ class UserController extends Controller
     {
         $user = User::create(Arr::except($request->validated(), ['profile_picture']));
         $file = $user->uploadAvatar($request->validated()['profile_picture']);
+        $qrCode = QrCode::format('svg')->size(200)->generate(env('FRONTEND_URL') . "/user-information/{$user->id}");
+        $qrCodeFile = $user->uploadQRCode($qrCode);
         $user->attachments()->create(Attachment::transformAvatarFileRequest($request->validated()['profile_picture'], $file));
-        $attachmentUrl = $this->generateAttachmentUrl($user->id);
-        $this->createAttachment($user, $attachmentUrl);
-
+        $user->attachments()->create(Attachment::transformQRCodeFileRequest($qrCodeFile));
         return new UserResource($user);
-    }
-
-    public function generateAttachmentUrl(int $userId)
-    {
-        return env('FRONTEND_URL') . '/user-information/' . $userId;
-    }
-
-    public function createAttachment(User $user, string $attachmentUrl)
-    {
-        return $user->attachments()->create([
-            'url' => $attachmentUrl,
-            'file_name' => 'qrCode',
-            'extension' => 'svg',
-            'type' => 'qrcode'
-        ]);
-    }
-
-    public function showInfo($userId)
-    {
-        $user = User::findOrFail($userId);
-        $attachmentData = $user->attachments;
-        $user->attachments;
-
-        $qrCodeDataUri = null;
-
-        foreach ($attachmentData as $attachment) {
-            if ($attachment->type === 'qrcode') {
-                $qrCode = QrCode::format('svg')->size(200)->generate($attachment->url);
-                $qrCodeDataUri = 'data:image/svg+xml;base64,' . base64_encode($qrCode);
-            }
-        }
-
-
-        return Response::json(['user' => $user, 'qrCodeDataUri' => $qrCodeDataUri,]);
     }
 }
