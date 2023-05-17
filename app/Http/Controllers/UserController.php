@@ -26,12 +26,11 @@ class UserController extends Controller
         $this->createAttachment($user, $attachmentUrl);
 
         return new UserResource($user);
-
     }
 
     public function generateAttachmentUrl(int $userId)
     {
-        return env('APP_URL').`/user-information/{$userId}`;
+        return env('FRONTEND_URL') . '/user-information/' . $userId;
     }
 
     public function createAttachment(User $user, string $attachmentUrl)
@@ -40,7 +39,7 @@ class UserController extends Controller
             'url' => $attachmentUrl,
             'file_name' => 'qrCode',
             'extension' => 'svg',
-             'type' => 'qrcode'
+            'type' => 'qrcode'
         ]);
     }
 
@@ -60,6 +59,6 @@ class UserController extends Controller
         }
 
 
-        return Response::json(['user'=>$user, 'qrCodeDataUri' => $qrCodeDataUri,]);
+        return Response::json(['user' => $user, 'qrCodeDataUri' => $qrCodeDataUri,]);
     }
 }
